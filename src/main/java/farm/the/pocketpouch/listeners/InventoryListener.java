@@ -27,7 +27,7 @@ public class InventoryListener implements Listener {
 
     @EventHandler
     public void onPlayerInventoryOpenEvent(PlayerAchievementAwardedEvent e) {
-        if (e.getAchievement().equals(Achievement.OPEN_INVENTORY)) {
+        if (e.getAchievement() == Achievement.OPEN_INVENTORY) {
             e.setCancelled(true);
 
             // only update inventory from non-creative players

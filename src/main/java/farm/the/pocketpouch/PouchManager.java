@@ -86,17 +86,16 @@ public class PouchManager {
             if (isAllAir(extraInv)) {
                 // 2x2 crafting slots contain only air; clear entry from file
                 PocketPouch.plugin.getConfig().set(player.getUniqueId().toString(), null);
-            } else if (player.getInventory().firstEmpty() != -1) {
-                // still place in main player inventory; try to empty extraInv
+            } else {
+                // try to empty extraInv
                 HashMap<Integer, ItemStack> tooManyItems = player.getInventory().addItem(extraInv);
                 if (tooManyItems.isEmpty()) {
-                    // extraInv's content is stored in player's main inventory
+                    // successfully moved extraInv's content into player's main inventory
                     PocketPouch.plugin.getConfig().set(player.getUniqueId().toString(), null);
                 } else {
+                    // some or all items are still left
                     PocketPouch.plugin.getConfig().set(player.getUniqueId().toString(), new ArrayList<>(tooManyItems.values()));
                 }
-            } else {
-                PocketPouch.plugin.getConfig().set(player.getUniqueId().toString(), Arrays.asList(extraInv));
             }
         }
     }
