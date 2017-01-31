@@ -2,6 +2,7 @@ package farm.the.pocketpouch;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -79,14 +80,23 @@ public class PouchManager {
         extraInventory.put(player, extraInv);
     }
 
-    public void saveAndUnload(UUID player) {
-        ItemStack[] extraInv = extraInventory.remove(player);
+    public void saveAndUnload(Player player) {
+        ItemStack[] extraInv = extraInventory.remove(player.getUniqueId());
         if (extraInv != null) {
-            if (!isAllAir(extraInv)) {
-                PocketPouch.plugin.getConfig().set(player.toString(), Arrays.asList(extraInv));
-            } else {
+            if (isAllAir(extraInv)) {
                 // 2x2 crafting slots contain only air; clear entry from file
-                PocketPouch.plugin.getConfig().set(player.toString(), null);
+                PocketPouch.plugin.getConfig().set(player.getUniqueId().toString(), null);
+            } else if (player.getInventory().firstEmpty() != -1) {
+                // still place in main player inventory; try to empty extraInv
+                HashMap<Integer, ItemStack> tooManyItems = player.getInventory().addItem(extraInv);
+                if (tooManyItems.isEmpty()) {
+                    // extraInv's content is stored in player's main inventory
+                    PocketPouch.plugin.getConfig().set(player.getUniqueId().toString(), null);
+                } else {
+                    PocketPouch.plugin.getConfig().set(player.getUniqueId().toString(), new ArrayList<>(tooManyItems.values()));
+                }
+            } else {
+                PocketPouch.plugin.getConfig().set(player.getUniqueId().toString(), Arrays.asList(extraInv));
             }
         }
     }
@@ -104,11 +114,11 @@ public class PouchManager {
         for (Map.Entry<UUID, ItemStack[]> entry : extraInventory.entrySet()) {
             FileConfiguration config = PocketPouch.plugin.getConfig();
             String uuid = entry.getKey().toString();
-            if (!isAllAir(entry.getValue())) {
-                config.set(uuid, Arrays.asList(entry.getValue()));
-            } else {
+            if (isAllAir(entry.getValue())) {
                 // 2x2 crafting slots contain only air; clear entry from file
                 config.set(uuid, null);
+            } else {
+                config.set(uuid, Arrays.asList(entry.getValue()));
             }
         }
         PocketPouch.plugin.saveConfig();

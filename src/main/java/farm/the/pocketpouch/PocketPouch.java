@@ -26,7 +26,6 @@ public class PocketPouch extends JavaPlugin {
         saveInterval = TimeUnit.MINUTES.toMillis(Math.max(5, PocketPouch.plugin.getConfig().getInt("save-interval")));
         lastSave = System.currentTimeMillis();
 
-        // TODO onPlayerQuit move extraInv items into main inventory if space is available
         getServer().getPluginManager().registerEvents(new InventoryListener(), this);
         getServer().getPluginManager().registerEvents(new JoinLeaveListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerDeathListener(), this);

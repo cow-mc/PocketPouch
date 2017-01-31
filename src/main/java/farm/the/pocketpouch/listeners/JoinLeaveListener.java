@@ -16,7 +16,7 @@ public class JoinLeaveListener implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e) {
-        PocketPouch.getPouchManager().saveAndUnload(e.getPlayer().getUniqueId());
+        PocketPouch.getPouchManager().saveAndUnload(e.getPlayer());
 
         // save config to disk every so often; alternative: a repeating task
         long now = System.currentTimeMillis();
