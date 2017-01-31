@@ -62,17 +62,9 @@ public class PouchManager {
         ItemStack[] extraInv = new ItemStack[4];
         int slot = 0;
 
-        Object items = PocketPouch.plugin.getConfig().get(player.toString());
-        if (items instanceof ItemStack[]) {
-            for (ItemStack item : ((ItemStack[]) items)) {
-                extraInv[slot] = item;
-                slot++;
-                if (slot > 4) {
-                    break;
-                }
-            }
-        } else if (items instanceof List<?>) {
-            for (Object item : (List<?>) items) {
+        List<?> items = PocketPouch.plugin.getConfig().getList(player.toString());
+        if (items != null) {
+            for (Object item : items) {
                 if (item instanceof ItemStack) {
                     extraInv[slot] = ((ItemStack) item);
                     slot++;
@@ -91,7 +83,7 @@ public class PouchManager {
         ItemStack[] extraInv = extraInventory.remove(player);
         if (extraInv != null) {
             if (!isAllAir(extraInv)) {
-                PocketPouch.plugin.getConfig().set(player.toString(), extraInv);
+                PocketPouch.plugin.getConfig().set(player.toString(), Arrays.asList(extraInv));
             } else {
                 // 2x2 crafting slots contain only air; clear entry from file
                 PocketPouch.plugin.getConfig().set(player.toString(), null);
@@ -108,12 +100,12 @@ public class PouchManager {
         return true;
     }
 
-    void saveAll() {
+    public void saveAll() {
         for (Map.Entry<UUID, ItemStack[]> entry : extraInventory.entrySet()) {
             FileConfiguration config = PocketPouch.plugin.getConfig();
             String uuid = entry.getKey().toString();
             if (!isAllAir(entry.getValue())) {
-                config.set(uuid, entry.getValue());
+                config.set(uuid, Arrays.asList(entry.getValue()));
             } else {
                 // 2x2 crafting slots contain only air; clear entry from file
                 config.set(uuid, null);

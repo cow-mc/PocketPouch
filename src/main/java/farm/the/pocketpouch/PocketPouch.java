@@ -6,11 +6,14 @@ import farm.the.pocketpouch.listeners.PlayerDeathListener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 public class PocketPouch extends JavaPlugin {
     public static PocketPouch plugin;
     public static Logger log;
+    private long saveInterval;
+    private long lastSave;
     private PouchManager pouchManager;
 
     @Override
@@ -19,6 +22,9 @@ public class PocketPouch extends JavaPlugin {
         log = getLogger();
         loadConfig();
         pouchManager = new PouchManager();
+        // minimum save interval: 5 minutes
+        saveInterval = TimeUnit.MINUTES.toMillis(Math.max(5, PocketPouch.plugin.getConfig().getInt("save-interval")));
+        lastSave = System.currentTimeMillis();
 
         // TODO onPlayerQuit move extraInv items into main inventory if space is available
         getServer().getPluginManager().registerEvents(new InventoryListener(), this);
@@ -39,6 +45,18 @@ public class PocketPouch extends JavaPlugin {
         } else {
             log.info("config.yml found, loading!");
         }
+    }
+
+    public long getSaveInterval() {
+        return saveInterval;
+    }
+
+    public long getLastSave() {
+        return lastSave;
+    }
+
+    public void setLastSave(long lastSave) {
+        this.lastSave = lastSave;
     }
 
     public static PouchManager getPouchManager() {
